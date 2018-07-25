@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+
+# output stored in './store.json' file as json
+
+#very basic, does very little by way of checking itself
+## you can enter the first count, then do the second later that day
+## but overwriting or correction must be done manually to the store
+
+import json
+import datetime
+
+
+past=json.loads(open("store","r").read())
+print(json.dumps(past,sort_keys=True,indent=2))
+
+
+c100=input(" "*2+"# of 100s ::")
+c050=input(" "*2+"# of  50s ::")
+c020=input(" "*2+"# of  20s ::")
+c010=input(" "*2+"# of  10s ::")
+c005=input(" "*2+"# of   5s ::")
+c001=input(" "*2+"# of   1s ::")
+
+cC25=input(" "*2+"# of .25s ::")
+cC10=input(" "*2+"# of .10s ::")
+cC05=input(" "*2+"# of .05s ::")
+cC01=input(" "*2+"# of .01s ::")
+
+recent=past[len(past)-1]
+try:
+  cPty=recent["second"]["petty"]
+except:
+  cPty=recent["first"]["petty"]
+lp="continue"
+plst=[]
+ptot=0
+while lp == "continue":
+  nPty=input(" "*2+"Pout ::  'same' if duplicate, or 'done' when finished\n")
+  if nPty=="done":
+    cPty={"total":ptot,"list":plst}
+    lp="done"
+  elif nPty=="same": 
+    lp="done"
+  else:
+    plst.append(float(nPty))
+    ptot=ptot+float(nPty)
+
+if recent["date"]==str(datetime.date.today()):
+  now=recent
+else:
+  now={"date":str(datetime.date.today()),"first":{},"second":{}}
+
+cTot=0
+cTot=cTot+int(c100)*100
+cTot=cTot+int(c050)*50
+cTot=cTot+int(c020)*20
+cTot=cTot+int(c010)*10
+cTot=cTot+int(c005)*5
+cTot=cTot+int(c001)*1
+cTot=cTot+int(cC25)*0.25
+cTot=cTot+int(cC10)*0.10
+cTot=cTot+int(cC05)*0.05
+cTot=cTot+int(cC01)*0.01
+cTot=cTot+float(ptot)
+
+
+whch=input(" "*2+"which count? 'f' for first,'s' for second,'b' for both\n")
+
+if whch=="b":
+  cpos=["first","second"]
+elif whch=="f":
+  cpos=["first"]
+elif whch=="s":
+  cpos=["second"]
+  
+for curr in cpos:  
+  now[curr]["100s"]=c100
+  now[curr]["050s"]=c050
+  now[curr]["020s"]=c020
+  now[curr]["010s"]=c010
+  now[curr]["005s"]=c005
+  now[curr]["001s"]=c001
+  now[curr][".25s"]=cC25
+  now[curr][".10s"]=cC10
+  now[curr][".05s"]=cC05
+  now[curr][".01s"]=cC01
+  now[curr]["total"]=cTot
+  now[curr]["petty"]={
+    "total":ptot,
+    "list":plst
+    }
+
+
+print(json.dumps(now,sort_keys=True,indent=2))
+past.append(now)
+fout=open("store","w")
+fout.write(json.dumps(past,sort_keys=True,indent=2))
+fout.close()
+
+#./cashd
